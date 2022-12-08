@@ -14,4 +14,9 @@ public class BookResponse {
     private String author;
     private String title;
     private boolean hasAuthor;
+
+    public BookResponse(String title, String author){
+        this.title = title;
+        this.author = author;
+    }
 }

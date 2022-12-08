@@ -1,10 +1,14 @@
 package app.prog.service;
 
+import app.prog.controller.response.BookResponse;
 import app.prog.model.Book;
 import app.prog.repository.BookRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,21 +27,46 @@ public class BookService {
     Therefore, the pageNumber and the releaseDate exists also in the Book model.
     A solution to create a book without the ID, the pageNumber and the releaseDate ?
      */
-    public List<Book> createBooks(List<Book> toCreate) {
-        return repository.saveAll(toCreate);
+    public List<Book> createBooks(List<BookResponse> toCreate) {
+        List<Book> books = new ArrayList<>();
+        for ( BookResponse bookResponse : toCreate
+             ) {
+            Book newBook = new Book();
+            newBook.setTitle(bookResponse.getTitle());
+            newBook.setAuthor(bookResponse.getAuthor());
+            books.add(newBook);
+
+        }
+
+        return books;
     }
 
     /*
     TODO-2-i: Why the createBooks and the updateBooks use the same repository method saveAll ?
+    allows us to save multiple entities to the DB even it already exists
     TODO-2-ii : Only ID, title and author should be provided during the update.
     Therefore, the pageNumber and the release date exists also in the Book model.
     A solution to update a book without the pageNumber and the releaseDate ?
      */
     public List<Book> updateBooks(List<Book> toUpdate) {
-        return repository.saveAll(toUpdate);
+        List<Book> books = new ArrayList<>();
+        for ( Book book: toUpdate
+        ) {
+            Book newBook = new Book();
+            newBook.setId(book.getId());
+            if (book.getAuthor()!=null){
+                newBook.setAuthor(book.getAuthor());
+            }
+            if (book.getTitle()!=null){
+                newBook.setTitle(book.getTitle());
+            }
+            books.add(newBook);
+        }
+        return repository.saveAll(books);
     }
 
     //TODO-3: should I use Integer here or int ? Why ?
+    // int cuz the given id should not be null as int doesn't take null value
     public Book deleteBook(int bookId) {
         /*
         TIPS: From the API, the Class Optional<T> is :
@@ -60,7 +89,8 @@ public class BookService {
         Link 1 : https://www.baeldung.com/spring-response-entity
         Link 2 : https://www.baeldung.com/exception-handling-for-rest-with-spring
          */
-            throw new RuntimeException("Book." + bookId + " not found");
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Book." + bookId + " not found");
         }
     }
 }
