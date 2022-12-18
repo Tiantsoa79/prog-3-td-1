@@ -2,7 +2,9 @@ package app.prog.controller;
 
 import app.prog.controller.mapper.BookRestMapper;
 import app.prog.controller.response.BookResponse;
-import app.prog.model.Book;
+import app.prog.controller.response.CreateBookResponse;
+import app.prog.controller.response.UpdateBookResponse;
+import app.prog.model.BookEntity;
 import app.prog.service.BookService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -22,18 +24,22 @@ public class BookController {
                 .toList();
     }
 
-    //TODO: This endpoint does not match with our API. Resolve it in the question-1.
     @PostMapping("/books")
-    public List<BookResponse> createBooks(@RequestBody List<BookResponse> toCreate) {
-        return service.createBooks(toCreate).stream()
+    public List<BookResponse> createBooks(@RequestBody List<CreateBookResponse> toCreate) {
+        List<BookEntity> domain = toCreate.stream()
+                .map(mapper::toDomain)
+                .toList();
+        return service.createBooks(domain).stream()
                 .map(mapper::toRest)
                 .toList();
     }
 
-    //TODO: This endpoint does not match with our API. Resolve it in the question-2-ii.
     @PutMapping("/books")
-    public List<BookResponse> updateBooks(@RequestBody List<Book> toUpdate) {
-        return service.updateBooks(toUpdate).stream()
+    public List<BookResponse> updateBooks(@RequestBody List<UpdateBookResponse> toUpdate) {
+        List<BookEntity> domain = toUpdate.stream()
+                .map(mapper::toDomain)
+                .toList();
+        return service.updateBooks(domain).stream()
                 .map(mapper::toRest)
                 .toList();
     }
